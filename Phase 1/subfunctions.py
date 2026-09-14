@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 def get_mass(rover):
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
@@ -11,7 +12,7 @@ def tau_dcmotor(omega, motor):
     '''computes output torque based on rotational speed and motor characteristics'''
     # checks if omega is scalar or array
     check_sora(omega, 'omega')
-    # TODO: 
+    # TODO: (note by gio: run getgearratio?)
     # computes tau
     tau = np.subtract(motor['torque_stall'],((motor['torque_stall']-motor['torque_noload'])/motor['speed_noload'])*omega)
     
@@ -31,8 +32,18 @@ def F_gravity(terrain_angle, rover, planet):
     if type(terrain_angle) in [int, float] and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
     return -1 * get_mass(rover) * planet['g'] * np.sin(np.radians(terrain_angle))
 
-def F_rolling():
-    if
+def F_rolling(omega, terrain_angle, rover, planet, Crr):
+    check_sora(omega, 'omega')
+    check_sora(terrain_angle, 'terrain_angle')
+    if type(omega) is not type(terrain_angle): raise Exception('omega and terrain_angle must be same type')
+    if type(omega) is np.ndarray and omega.shape != terrain_angle.shape: raise Exception('omega and terrain_angle must be same size')
+    if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
+    if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
+    if type(terrain_angle) is np.ndarray and (min(terrain_angle) < -75 or max(terrain_angle) > 75): raise Exception('Argument \'terrain_angle\' must have values between -75 and +75 degrees')
+    if type(terrain_angle) in [int, float] and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
+    if type(Crr) not in [int, float]: raise Exception('Argument \'Crr\' must be scalar')
+    if Crr <= 0: raise Exception('Argument \'Crr\' must be positive')
+    return math.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(terrain_angle)
 
 def F_net():
     pass

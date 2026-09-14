@@ -44,3 +44,6 @@ planet = {
 
 print(sf.get_mass(rover))
 print(sf.F_gravity(np.linspace(0,1,20), rover, planet))
+
+print(np.array([0,0]).shape == np.array([1,1]).shape)
+
