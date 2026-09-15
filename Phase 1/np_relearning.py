@@ -40,10 +40,14 @@ planet = {
     "g": 3.72 # meters/second/second
 }
 
-#print(sf.tau_dcmotor(np.linspace(0,1,20), rover["wheel_assembly"]["motor"]))
+print(sf.tau_dcmotor(np.linspace(0,1,20), rover["wheel_assembly"]["motor"]))
+print(sf.tau_dcmotor(5, rover["wheel_assembly"]["motor"]))
+print(sf.tau_dcmotor(-2.0, rover["wheel_assembly"]["motor"]))
 
-print(sf.get_mass(rover))
-print(sf.F_gravity(np.linspace(0,1,20), rover, planet))
+print(sf.get_gear_ratio(rover['wheel_assembly']['speed_reducer']))
 
-print(np.array([0,0]).shape == np.array([1,1]).shape)
+#print(sf.get_mass(rover))
+#print(sf.F_gravity(np.linspace(0,1,20), rover, planet))
+
+#print(np.array([0,0]).shape == np.array([1,1]).shape)
 

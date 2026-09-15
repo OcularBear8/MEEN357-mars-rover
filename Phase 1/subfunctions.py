@@ -5,18 +5,39 @@ def get_mass(rover):
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
     return 6*(rover['wheel_assembly']['wheel']['mass'] + rover['wheel_assembly']['speed_reducer']['mass'] + rover['wheel_assembly']['motor']['mass']) + rover['chassis']['mass'] + rover['science_payload']['mass'] + rover['power_subsys']['mass']
 
-def get_gear_ratio():
-    pass
+def get_gear_ratio(speed_reducer):
+    # checks for dictionary
+    if type(speed_reducer) is not dict: raise Exception('Argument \'speed_reducer\' must be dict')
+    # checks for typing
+    if speed_reducer['type'].lower() != "reverted": raise Exception('Speed reducer must be reverted type')
+    # computes reduction
+    return (speed_reducer['diam_gear']/speed_reducer['diam_pinion'])
+
 
 def tau_dcmotor(omega, motor):
     '''computes output torque based on rotational speed and motor characteristics'''
     # checks if omega is scalar or array
     check_sora(omega, 'omega')
-    # TODO: (note by gio: run getgearratio?)
     # computes tau
-    tau = np.subtract(motor['torque_stall'],((motor['torque_stall']-motor['torque_noload'])/motor['speed_noload'])*omega)
-    
-    return tau # torque at motor shaft (Nm)
+    if np.iterable(omega): #iterable
+        tau = np.array([])
+        for i in omega:
+            if i<0:
+                tau = np.append(tau,motor['torque_stall'])
+            elif i<motor['speed_noload']:
+                tau = np.append(tau,motor['torque_stall'] - ((motor['torque_stall'] - motor['torque_noload']) / motor['speed_noload']) * i)
+            else:
+                tau = np.append(tau,0)
+
+        return tau
+
+    else: #scalar case
+        if omega < 0:
+            return motor['torque_stall']
+        elif omega < motor['speed_noload']:
+            return motor['torque_stall'] - ((motor['torque_stall'] - motor['torque_noload']) / motor['speed_noload']) * omega
+        else:
+            return 0
 
 def F_drive(omega, rover):
     check_sora(omega, 'omega')
