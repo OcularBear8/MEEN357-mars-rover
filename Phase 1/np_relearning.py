@@ -43,7 +43,8 @@ planet = {
 print(sf.tau_dcmotor(np.linspace(0,1,20), rover["wheel_assembly"]["motor"]))
 print(sf.tau_dcmotor(5, rover["wheel_assembly"]["motor"]))
 print(sf.tau_dcmotor(-2.0, rover["wheel_assembly"]["motor"]))
-print(sf.tau_dcmotor('yup', rover["wheel_assembly"]["motor"]))
+
+print(sf.get_gear_ratio(rover['wheel_assembly']['speed_reducer']))
 
 #print(sf.get_mass(rover))
 #print(sf.F_gravity(np.linspace(0,1,20), rover, planet))
