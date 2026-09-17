@@ -1,4 +1,5 @@
 import numpy as np
+import scipy as sp
 import math
 
 def get_mass(rover):
@@ -64,10 +65,24 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     if type(terrain_angle) in [int, float] and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
     if type(Crr) not in [int, float]: raise Exception('Argument \'Crr\' must be scalar')
     if Crr <= 0: raise Exception('Argument \'Crr\' must be positive')
-    return math.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(terrain_angle)
 
-def F_net():
-    pass
+    return sp.special.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(terrain_angle)
+
+def F_net(omega, terrain_angle, rover, planet, Crr):
+    # check inputs
+    check_sora(omega, 'omega')
+    check_sora(terrain_angle, 'terrain_angle')
+    if type(omega) is not type(terrain_angle): raise Exception('omega and terrain_angle must be same type')
+    if type(omega) is np.ndarray and omega.shape != terrain_angle.shape: raise Exception('omega and terrain_angle must be same size')
+    if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
+    if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
+    if type(terrain_angle) is np.ndarray and (min(terrain_angle) < -75 or max(terrain_angle) > 75): raise Exception('Argument \'terrain_angle\' must have values between -75 and +75 degrees')
+    if type(terrain_angle) in [int, float] and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
+    if type(Crr) not in [int, float]: raise Exception('Argument \'Crr\' must be scalar')
+    if Crr <= 0: raise Exception('Argument \'Crr\' must be positive')
+
+    return F_drive(omega, rover) - F_gravity(terrain_angle,rover, planet) - F_rolling(omega, terrain_angle, rover, planet, Crr)
+
 
 def check_sora(inp, var_name):
     if type(inp) not in [float,int,np.ndarray]: raise Exception(f'Argument {var_name} must be scalar or vector')
