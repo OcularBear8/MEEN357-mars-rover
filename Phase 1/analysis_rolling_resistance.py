@@ -22,5 +22,3 @@ plt.plot(Crr_array, v_max)
 plt.xlabel('Rolling Resistance')
 plt.ylabel('Maximum Velocity [m/s]')
 plt.show()
-
-print(v_max)
