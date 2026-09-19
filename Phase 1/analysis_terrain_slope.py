@@ -6,15 +6,14 @@ from global_dicts import *
 
 CRR = 0.15
 slope_array_deg = np.linspace(-15, 35, 25)
-print(slope_array_deg)
 v_max = np.zeros(len(slope_array_deg))
 
 for i, slope in enumerate(slope_array_deg):
-    def accel(omega):
+    def force(omega):
         return F_net(omega, slope, rover, planet, CRR)
     
     try:
-        sol = root_scalar(accel, bracket=[0, 4])
+        sol = root_scalar(force, bracket=[0, 4])
         v_max[i] = sol.root * rover['wheel_assembly']['wheel']['radius']
     except ValueError:
         v_max[i] = np.nan
