@@ -51,12 +51,13 @@ def F_gravity(terrain_angle, rover, planet):
     if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
     if type(terrain_angle) is np.ndarray and (min(terrain_angle) < -75 or max(terrain_angle) > 75): raise Exception('Argument \'terrain_angle\' must have values between -75 and +75 degrees')
     if type(terrain_angle) in [int, float] and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
-    return -1 * get_mass(rover) * planet['g'] * np.sin(np.radians(terrain_angle))
+    return get_mass(rover) * planet['g'] * np.sin(np.radians(terrain_angle))
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
+    # lots of input checking
     check_sora(omega, 'omega')
     check_sora(terrain_angle, 'terrain_angle')
-    if type(omega) is not type(terrain_angle): raise Exception('omega and terrain_angle must be same type')
+    if np.isscalar(omega) != np.isscalar(terrain_angle): raise Exception('omega and terrain_angle must be same type')
     if type(omega) is np.ndarray and omega.shape != terrain_angle.shape: raise Exception('omega and terrain_angle must be same size')
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
     if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
@@ -71,7 +72,7 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     # check inputs
     check_sora(omega, 'omega')
     check_sora(terrain_angle, 'terrain_angle')
-    if type(omega) is not type(terrain_angle): raise Exception('omega and terrain_angle must be same type')
+    if np.isscalar(omega) != np.isscalar(terrain_angle): raise Exception('omega and terrain_angle must be same type')
     if type(omega) is np.ndarray and omega.shape != terrain_angle.shape: raise Exception('omega and terrain_angle must be same size')
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
     if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
@@ -84,4 +85,4 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
 
 def check_sora(inp, var_name):
-    if type(inp) not in [float,int,np.ndarray]: raise Exception(f'Argument {var_name} must be scalar or vector')
+    if type(inp) is not np.ndarray and not np.isscalar(inp): raise Exception(f'Argument {var_name} must be scalar or vector')
