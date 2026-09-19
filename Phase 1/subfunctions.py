@@ -1,6 +1,5 @@
 import numpy as np
 import scipy as sp
-import math
 
 def get_mass(rover):
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
