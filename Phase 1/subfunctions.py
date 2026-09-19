@@ -66,7 +66,7 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     if type(Crr) not in [int, float]: raise Exception('Argument \'Crr\' must be scalar')
     if Crr <= 0: raise Exception('Argument \'Crr\' must be positive')
 
-    return sp.special.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(terrain_angle)
+    return sp.special.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(np.radians(terrain_angle))
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
     # check inputs
