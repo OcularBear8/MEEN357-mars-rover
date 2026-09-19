@@ -1,9 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from global_dicts import *
-from subfunctions import tau_dcmotor, check_sora
+from subfunctions import *
 
-speed_range = np.linspace(0, 4, 25)
+speed_range = np.linspace(0, rover['wheel_assembly']['motor']['speed_noload'], 25)
 torque_range = np.linspace(0, 200, 25)
 
 def P_dcmotor(tau, motor):
@@ -19,15 +19,17 @@ def P_dcmotor(tau, motor):
 
 # speed vs torque
 plt.subplot(3, 1, 1)
-speed = P_dcmotor(torque_range, rover['wheel_assembly']['motor']) / torque_range
-plt.plot(torque_range, speed)
+torque = tau_dcmotor(speed_range, rover['wheel_assembly']['motor'])
+plt.plot(torque, speed_range)
 plt.xlabel('Motor Shaft Torque [N*m]')
 plt.ylabel('Motor Shaft Speed [rad/s]')
 
 # power vs torque
 plt.subplot(3, 1, 2)
-power = P_dcmotor(torque_range, rover['wheel_assembly']['motor'])
-plt.plot(torque_range, power)
+torque = tau_dcmotor(speed_range, rover['wheel_assembly']['motor'])
+power = torque * speed_range
+plt.plot(torque, power)
+
 plt.xlabel('Motor Shaft Torque [N*m]')
 plt.ylabel('Motor Power [W]')
 
