@@ -5,7 +5,7 @@ from global_dicts import *
 
 CRR = 0.15
 
-slope = 17
+slope = -2
 
 omega_test = np.linspace(0, 4, 25)
 
