@@ -43,7 +43,7 @@ def tau_dcmotor(omega, motor):
 def F_drive(omega, rover):
     check_sora(omega, 'omega')
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
-    tau = tau_dcmotor(omega, rover['wheel_assembly']['motor'])
+    tau = tau_dcmotor(omega, rover['wheel_assembly']['motor']) * get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
     return tau / rover['wheel_assembly']['wheel']['radius']
 
 def F_gravity(terrain_angle, rover, planet):
