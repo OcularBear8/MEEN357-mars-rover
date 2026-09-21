@@ -19,24 +19,10 @@ def tau_dcmotor(omega, motor):
     # checks if omega is scalar or array
     check_sora(omega, 'omega')
     # computes tau
-    if np.iterable(omega): #iterable
-        tau = np.array([])
-        for i in omega:
-            if i<0:
-                tau = np.append(tau,motor['torque_stall'])
-            elif i<motor['speed_noload']:
-                tau = np.append(tau,motor['torque_stall'] - ((motor['torque_stall'] - motor['torque_noload']) / motor['speed_noload']) * i)
-            else:
-                tau = np.append(tau,0)
-        return tau
-
-    else: #scalar case
-        if omega < 0:
-            return motor['torque_stall']
-        elif omega < motor['speed_noload']:
-            return motor['torque_stall'] - ((motor['torque_stall'] - motor['torque_noload']) / motor['speed_noload']) * omega
-        else:
-            return 0
+    conditions = [omega < 0,omega < motor['speed_noload'], omega > motor['speed_noload']]
+    choices = [motor['torque_stall'], motor['torque_stall'] - ((motor['torque_stall'] - motor['torque_noload']) / motor['speed_noload']) * omega, 0]
+    tau = np.select(conditions,choices,default=np.nan)
+    return tau
 
 def F_drive(omega, rover):
     check_sora(omega, 'omega')
