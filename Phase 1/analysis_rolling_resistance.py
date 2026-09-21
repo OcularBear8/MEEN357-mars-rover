@@ -14,7 +14,7 @@ for i, Crr in enumerate(Crr_array):
 
     try:
         sol = root_scalar(force, bracket=[0, rover['wheel_assembly']['motor']['speed_noload']])
-        v_max[i] = sol.root
+        v_max[i] = sol.root * rover['wheel_assembly']['wheel']['radius']
     except ValueError:
         v_max[i] = np.nan
 
