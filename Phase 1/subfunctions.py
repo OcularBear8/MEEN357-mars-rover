@@ -37,7 +37,7 @@ def F_gravity(terrain_angle, rover, planet):
     if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
     if type(terrain_angle) is np.ndarray and (min(terrain_angle) < -75 or max(terrain_angle) > 75): raise Exception('Argument \'terrain_angle\' must have values between -75 and +75 degrees')
     if np.isscalar(terrain_angle) != np.isscalar(terrain_angle) and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
-    return get_mass(rover) * planet['g'] * np.sin(np.radians(terrain_angle))
+    return -1*get_mass(rover) * planet['g'] * np.sin(np.radians(terrain_angle))
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
     # lots of input checking
@@ -52,7 +52,7 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     if np.isscalar(Crr) != np.isscalar(Crr): raise Exception('Argument \'Crr\' must be scalar')
     if Crr <= 0: raise Exception('Argument \'Crr\' must be positive')
 
-    return sp.special.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(np.radians(terrain_angle))
+    return -1*sp.special.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(np.radians(terrain_angle))
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
     # check inputs
@@ -67,11 +67,12 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     if np.isscalar(Crr) != np.isscalar(Crr): raise Exception('Argument \'Crr\' must be scalar')
     if Crr <= 0: raise Exception('Argument \'Crr\' must be positive')
 
-    return F_drive(omega, rover) - F_gravity(terrain_angle,rover, planet) - F_rolling(omega, terrain_angle, rover, planet, Crr)
+    return F_drive(omega, rover) + F_gravity(terrain_angle,rover, planet) + F_rolling(omega, terrain_angle, rover, planet, Crr)
 
 
 def check_sora(inp, var_name):
-    if type(inp) is not np.ndarray and not np.isscalar(inp): raise Exception(f'Argument {var_name} must be scalar or vector')
-    if type(inp) is np.ndarray:
-        for element in inp.flatten():
-            check_sora(element, var_name)
+    if isinstance(inp, np.ndarray):
+        for i in inp:
+            if not isinstance(i, (float, int, np.number)): raise Exception(f'Argument {var_name} must be scalar or vector')
+    else:
+        if not isinstance(inp, (float, int, np.number)): raise Exception(f'Argument {var_name} must be scalar or vector')
