@@ -18,17 +18,20 @@ def tau_dcmotor(omega, motor):
     '''computes output torque based on rotational speed and motor characteristics'''
     # checks if omega is scalar or array
     check_sora(omega, 'omega')
-    if type(motor) is not dict: raise Exception('Argument \'rover\' must be dict')
+    if not isinstance(motor, dict): raise Exception('Argument \'rover\' must be dict')
     # computes tau
-    conditions = [omega < 0,omega < motor['speed_noload'], omega > motor['speed_noload']]
+    conditions = [omega < 0,omega <= motor['speed_noload'], omega > motor['speed_noload']]
     choices = [motor['torque_stall'], motor['torque_stall'] - ((motor['torque_stall'] - motor['torque_noload']) / motor['speed_noload']) * omega, 0]
     tau = np.select(conditions,choices,default=np.nan)
-    return tau
+    if np.shape(tau) == (1,):
+        return tau[0]
+    else:
+        return tau
 
 def F_drive(omega, rover):
     check_sora(omega, 'omega')
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
-    tau = tau_dcmotor(omega, rover['wheel_assembly']['motor']) * get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
+    tau = 6 * tau_dcmotor(omega, rover['wheel_assembly']['motor']) * get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
     return tau / rover['wheel_assembly']['wheel']['radius']
 
 def F_gravity(terrain_angle, rover, planet):
@@ -58,13 +61,13 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     # check inputs
     check_sora(omega, 'omega')
     check_sora(terrain_angle, 'terrain_angle')
-    if np.isscalar(omega) != np.isscalar(terrain_angle): raise Exception('omega and terrain_angle must be same type')
-    if type(omega) is np.ndarray and omega.shape != terrain_angle.shape: raise Exception('omega and terrain_angle must be same size')
+    if isinstance(omega, np.ndarray) and not isinstance(terrain_angle, np.ndarray): raise Exception('omega and terrain_angle must be same type')
+    if isinstance(omega, np.ndarray) and isinstance(terrain_angle, np.ndarray) and omega.shape != terrain_angle.shape: raise Exception('omega and terrain_angle must be same size')
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
     if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
     if type(terrain_angle) is np.ndarray and (min(terrain_angle) < -75 or max(terrain_angle) > 75): raise Exception('Argument \'terrain_angle\' must have values between -75 and +75 degrees')
-    if np.isscalar(terrain_angle) != np.isscalar(terrain_angle) and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
-    if np.isscalar(Crr) != np.isscalar(Crr): raise Exception('Argument \'Crr\' must be scalar')
+    if isinstance(terrain_angle, (float, int, np.number)) and (terrain_angle < -75 or terrain_angle > 75): raise Exception('Argument \'terrain_angle\' must be between -75 and +75 degrees')
+    if not isinstance(Crr, (float, int, np.number)): raise Exception('Argument \'Crr\' must be scalar')
     if Crr <= 0: raise Exception('Argument \'Crr\' must be positive')
 
     return F_drive(omega, rover) + F_gravity(terrain_angle,rover, planet) + F_rolling(omega, terrain_angle, rover, planet, Crr)
