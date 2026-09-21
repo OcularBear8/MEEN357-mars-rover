@@ -72,3 +72,6 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
 def check_sora(inp, var_name):
     if type(inp) is not np.ndarray and not np.isscalar(inp): raise Exception(f'Argument {var_name} must be scalar or vector')
+    if type(inp) is np.ndarray:
+        for element in inp.flatten():
+            check_sora(element, var_name)
