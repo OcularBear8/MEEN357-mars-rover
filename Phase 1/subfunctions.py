@@ -11,13 +11,14 @@ def get_gear_ratio(speed_reducer):
     # checks for typing
     if speed_reducer['type'].lower() != "reverted": raise Exception('Speed reducer must be reverted type')
     # computes reduction
-    return (speed_reducer['diam_gear']/speed_reducer['diam_pinion'])
+    return (speed_reducer['diam_gear']/speed_reducer['diam_pinion'])**2
 
 
 def tau_dcmotor(omega, motor):
     '''computes output torque based on rotational speed and motor characteristics'''
     # checks if omega is scalar or array
     check_sora(omega, 'omega')
+    if type(motor) is not dict: raise Exception('Argument \'rover\' must be dict')
     # computes tau
     conditions = [omega < 0,omega < motor['speed_noload'], omega > motor['speed_noload']]
     choices = [motor['torque_stall'], motor['torque_stall'] - ((motor['torque_stall'] - motor['torque_noload']) / motor['speed_noload']) * omega, 0]
