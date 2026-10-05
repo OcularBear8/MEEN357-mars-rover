@@ -72,6 +72,40 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
 
     return F_drive(omega, rover) + F_gravity(terrain_angle,rover, planet) + F_rolling(omega, terrain_angle, rover, planet, Crr)
 
+def motorW(v, rover):
+    check_sora(v, 'v')
+    return get_gear_ratio(rover['wheel_assembly']['speed_reducer']) * v / rover['wheel_assembly']['wheel']['radius']
+
+def rover_dynamics(t, y, rover, planet, experiment):
+    if not isinstance(t, (float, int, np.number)): raise Exception(f'Argument \'t\' must be scalar')
+    if not isinstance(y, np.ndarray): raise Exception(f'Argument \'y\' must be a vector')
+    if np.shape(y) != (2,): raise Exception(f'Argument \'y\' must be a two-element array')
+    if not isinstance(rover, dict): raise Exception(f'Argument \'rover\' must be dict')
+    if not isinstance(planet, dict): raise Exception(f'Argument \'planet\' must be dict')
+    if not isinstance(experiment, dict): raise Exception(f'Argument \'experiment\' must be dict')
+    alpha_fun = sp.interpolate.CubicSpline(experiment['alpha_dist'], experiment['alpha_deg'], extrapolate=True)
+    return np.array([F_net(motorW(y[1]), alpha_fun(y[1]), rover, planet, experiment['Crr']) / get_mass(rover), y[0]])
+
+def mechpower(v, rover):
+    # input check
+    check_sora(v, 'v')
+    if isinstance(v, np.ndarray):
+        if v.ndim != 1:
+            raise Exception(f'Argument v must be a single-dimensional array')
+    if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
+    
+    return motorW(v, rover) * tau_dcmotor(motorW(v, rover), rover['wheel_assembly']['motor'])
+
+def battenergy(t, v, rover):
+    check_sora(t, "time")
+    check_sora(v, "velocity")
+    if t.shape != v.shape: raise Exception('t and v must be same size')
+    if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
+
+    # interpolate for efficiency
+    effcy_fun = sp.interpolate.CubicSpline(rover["wheel_assembly"]["motor"]["effcy_tau"],rover["wheel_assembly"]["motor"]["effcy"], extrapolate=True)
+    return mechpower(v, rover) / effcy_fun(tau_dcmotor(motorW(v,rover),rover["wheel_assembly"]["motor"]))
+
 
 def check_sora(inp, var_name):
     if isinstance(inp, np.ndarray):
