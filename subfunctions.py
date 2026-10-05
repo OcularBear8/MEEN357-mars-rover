@@ -2,8 +2,21 @@ import numpy as np
 import scipy as sp
 
 def get_mass(rover):
+    """Returns mass of the rover.
+
+    Args:
+        rover (dict): Physical parameters of the rover.
+
+    Raises:
+        Exception: Error if rover is not a dictionary.
+
+    Returns:
+        float: Mass of the rover.
+    """
+    
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
     return 6*(rover['wheel_assembly']['wheel']['mass'] + rover['wheel_assembly']['speed_reducer']['mass'] + rover['wheel_assembly']['motor']['mass']) + rover['chassis']['mass'] + rover['science_payload']['mass'] + rover['power_subsys']['mass']
+
 
 def get_gear_ratio(speed_reducer):
     # checks for dictionary
@@ -16,6 +29,7 @@ def get_gear_ratio(speed_reducer):
 
 def tau_dcmotor(omega, motor):
     '''computes output torque based on rotational speed and motor characteristics'''
+
     # checks if omega is scalar or array
     check_sora(omega, 'omega')
     if not isinstance(motor, dict): raise Exception('Argument \'rover\' must be dict')
@@ -73,6 +87,18 @@ def F_net(omega, terrain_angle, rover, planet, Crr):
     return F_drive(omega, rover) + F_gravity(terrain_angle,rover, planet) + F_rolling(omega, terrain_angle, rover, planet, Crr)
 
 def motorW(v, rover):
+    """Calculates the rotational speed of the motor shaft in rad/s from the translatinal velocity of the rover and the physical parameters of the rover.
+
+    Args:
+        v (np.ndarray or scalar float/int): Rover translational velocity (m/s)
+        rover (dict): Physical parameters of the rover.
+
+    Raises:
+        Exception: Error if v is not a scalar or vector.
+
+    Returns:
+        np.ndarray or scalar float/int: motor speed (rad/s)
+    """
     check_sora(v, 'v')
     return get_gear_ratio(rover['wheel_assembly']['speed_reducer']) * v / rover['wheel_assembly']['wheel']['radius']
 
@@ -97,6 +123,7 @@ def mechpower(v, rover):
     return motorW(v, rover) * tau_dcmotor(motorW(v, rover), rover['wheel_assembly']['motor'])
 
 def battenergy(t, v, rover):
+
     check_sora(t, "time")
     check_sora(v, "velocity")
     if t.shape != v.shape: raise Exception('t and v must be same size')
