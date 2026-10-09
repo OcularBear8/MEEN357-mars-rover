@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+from end_of_mission_event import end_of_mission_event
 
 def get_mass(rover):
     """Returns mass of the rover.
@@ -19,6 +20,18 @@ def get_mass(rover):
 
 
 def get_gear_ratio(speed_reducer):
+    """Computes the total gear ratio of the planetary speed reducer.
+
+    Args:
+        speed_reducer (dict): Physical parameters of the speed reducer.
+
+    Raises:
+        Exception: Error if speed_reducer is not a dictionary.
+        Exception: Error if speed_reducer is not a "reverted" type.
+
+    Returns:
+        float: total gear reduction
+    """
     # checks for dictionary
     if type(speed_reducer) is not dict: raise Exception('Argument \'speed_reducer\' must be dict')
     # checks for typing
@@ -28,8 +41,19 @@ def get_gear_ratio(speed_reducer):
 
 
 def tau_dcmotor(omega, motor):
-    '''computes output torque based on rotational speed and motor characteristics'''
+    """Computes output torque based on rotational speed and motor characteristics
 
+    Args:
+        omega (np.ndarray or scalar float/int): Speed(s) of the motor.
+        rover (dict): Physical parameters of the rover.
+
+    Raises:
+        Exception: Error if omega is not a scalar or array.
+        Exception: Error if rover is not a dictionary.
+
+    Returns:
+        np.ndarray or scalar float/int: Applied Torque(s) by the motor.
+    """
     # checks if omega is scalar or array
     check_sora(omega, 'omega')
     if not isinstance(motor, dict): raise Exception('Argument \'rover\' must be dict')
@@ -43,12 +67,40 @@ def tau_dcmotor(omega, motor):
         return tau
 
 def F_drive(omega, rover):
+    """_summary_
+
+    Args:
+        omega (_type_): _description_
+        rover (_type_): _description_
+
+    Raises:
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     check_sora(omega, 'omega')
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
     tau = 6 * tau_dcmotor(omega, rover['wheel_assembly']['motor']) * get_gear_ratio(rover['wheel_assembly']['speed_reducer'])
     return tau / rover['wheel_assembly']['wheel']['radius']
 
 def F_gravity(terrain_angle, rover, planet):
+    """_summary_
+
+    Args:
+        terrain_angle (_type_): _description_
+        rover (_type_): _description_
+        planet (_type_): _description_
+
+    Raises:
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     check_sora(terrain_angle, 'terrain_angle')
     if type(rover) is not dict: raise Exception('Argument \'rover\' must be dict')
     if type(planet) is not dict: raise Exception('Argument \'planet\' must be dict')
@@ -57,6 +109,28 @@ def F_gravity(terrain_angle, rover, planet):
     return -1*get_mass(rover) * planet['g'] * np.sin(np.radians(terrain_angle))
 
 def F_rolling(omega, terrain_angle, rover, planet, Crr):
+    """_summary_
+
+    Args:
+        omega (_type_): _description_
+        terrain_angle (_type_): _description_
+        rover (_type_): _description_
+        planet (_type_): _description_
+        Crr (_type_): _description_
+
+    Raises:
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     # lots of input checking
     check_sora(omega, 'omega')
     check_sora(terrain_angle, 'terrain_angle')
@@ -72,6 +146,28 @@ def F_rolling(omega, terrain_angle, rover, planet, Crr):
     return -1*sp.special.erf(40*rover['wheel_assembly']['wheel']['radius']*omega/get_gear_ratio(rover['wheel_assembly']['speed_reducer']))*Crr*get_mass(rover)*planet['g']*np.cos(np.radians(terrain_angle))
 
 def F_net(omega, terrain_angle, rover, planet, Crr):
+    """_summary_
+
+    Args:
+        omega (_type_): _description_
+        terrain_angle (_type_): _description_
+        rover (_type_): _description_
+        planet (_type_): _description_
+        Crr (_type_): _description_
+
+    Raises:
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     # check inputs
     check_sora(omega, 'omega')
     check_sora(terrain_angle, 'terrain_angle')
@@ -103,6 +199,26 @@ def motorW(v, rover):
     return get_gear_ratio(rover['wheel_assembly']['speed_reducer']) * v / rover['wheel_assembly']['wheel']['radius']
 
 def rover_dynamics(t, y, rover, planet, experiment):
+    """_summary_
+
+    Args:
+        t (_type_): _description_
+        y (_type_): _description_
+        rover (_type_): _description_
+        planet (_type_): _description_
+        experiment (_type_): _description_
+
+    Raises:
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     if not isinstance(t, (float, int, np.number)): raise Exception(f'Argument \'t\' must be scalar')
     if not isinstance(y, np.ndarray): raise Exception(f'Argument \'y\' must be a vector')
     if np.shape(y) != (2,): raise Exception(f'Argument \'y\' must be a two-element array')
@@ -113,6 +229,19 @@ def rover_dynamics(t, y, rover, planet, experiment):
     return np.array([F_net(motorW(y[1]), alpha_fun(y[1]), rover, planet, experiment['Crr']) / get_mass(rover), y[0]])
 
 def mechpower(v, rover):
+    """_summary_
+
+    Args:
+        v (_type_): _description_
+        rover (_type_): _description_
+
+    Raises:
+        Exception: _description_
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     # input check
     check_sora(v, 'v')
     if isinstance(v, np.ndarray):
@@ -123,7 +252,20 @@ def mechpower(v, rover):
     return motorW(v, rover) * tau_dcmotor(motorW(v, rover), rover['wheel_assembly']['motor'])
 
 def battenergy(t, v, rover):
+    """_summary_
 
+    Args:
+        t (_type_): _description_
+        v (_type_): _description_
+        rover (_type_): _description_
+
+    Raises:
+        Exception: _description_
+        Exception: _description_
+
+    Returns:
+        _type_: _description_
+    """
     check_sora(t, "time")
     check_sora(v, "velocity")
     if t.shape != v.shape: raise Exception('t and v must be same size')
@@ -131,8 +273,18 @@ def battenergy(t, v, rover):
 
     # interpolate for efficiency
     effcy_fun = sp.interpolate.CubicSpline(rover["wheel_assembly"]["motor"]["effcy_tau"],rover["wheel_assembly"]["motor"]["effcy"], extrapolate=True)
+    # TODO: integrate power
     return mechpower(v, rover) / effcy_fun(tau_dcmotor(motorW(v,rover),rover["wheel_assembly"]["motor"]))
 
+def simulate_rover(rover, planet, experiment, end_event):
+    if not isinstance(rover, dict): raise Exception(f'Argument \'rover\' must be dict')
+    if not isinstance(planet, dict): raise Exception(f'Argument \'planet\' must be dict')
+    if not isinstance(experiment, dict): raise Exception(f'Argument \'experiment\' must be dict')
+    if not isinstance(end_event, dict): raise Exception(f'Argument \'end_event\' must be dict')
+    trajectory = lambda t, y: rover_dynamics(t, y, rover, planet, experiment)
+    sol = sp.integrate.solve_ivp(trajectory, experiment['time_range'], experiment['initial_conditions'], events=end_of_mission_event(end_event))
+    
+    
 
 def check_sora(inp, var_name):
     if isinstance(inp, np.ndarray):
