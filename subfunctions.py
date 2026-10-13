@@ -310,7 +310,7 @@ def simulate_rover(rover, planet, experiment, end_event):
     trajectory = lambda t, y: rover_dynamics(t, y, rover, planet, experiment)
     # IVP solver, using DOP853 for 8th-order RK
     # end_events to stop ivp solver
-    sol = sp.integrate.solve_ivp(trajectory, experiment['time_range'], experiment['initial_conditions'], method='DOP853', events=end_of_mission_event(end_event))
+    sol = sp.integrate.solve_ivp(trajectory, experiment['time_range'], experiment['initial_conditions'], method='BDF', t_eval=np.linspace(0, 20000, 40000), events=end_of_mission_event(end_event))
     time, pos, vel = sol.t, sol.y[1], sol.y[0]
     power = mechpower(vel, rover)
     battery_energy = battenergy(time, vel, rover)
