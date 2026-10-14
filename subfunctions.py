@@ -277,10 +277,10 @@ def battenergy(t, v, rover):
     Y = []
 
     for i in range(len(t)):
-        Y.append(mechpower(v[i], rover) / effcy_fun(tau_dcmotor(motorW(v[i],rover),rover["wheel_assembly"]["motor"])))
+        Y.append(6*mechpower(v[i], rover) / effcy_fun(tau_dcmotor(motorW(v[i],rover),rover["wheel_assembly"]["motor"])))
 
     # returns integral
-    return 6*sp.integrate.simpson(Y,t)
+    return sp.integrate.trapezoid(Y,t)
 
 
 
