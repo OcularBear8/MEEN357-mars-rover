@@ -40,24 +40,24 @@ for diam in parachute_diam:
     edl_system = initialize_edl(diam)
     t, y, _ = simulate_edl(edl_system, mars, mission_events, tmax, True)
     end_time = np.append(end_time, t[-1])
-    landing_speed = np.hstack((landing_speed, y[-1][0]))
-    if y[-1][1] >= edl_system["sky_crane"]["danger_altitude"] and abs(y[-1][0] + y[-1][5]) <= abs(edl_system["sky_crane"]["danger_speed"]):
+    landing_speed = np.append(landing_speed, y[0][-1])
+    if y[1][-1] >= edl_system["sky_crane"]["danger_altitude"] and abs(y[0][-1] + y[5][-1]) <= abs(edl_system["sky_crane"]["danger_speed"]):
         success = np.append(success, 1)
     else: success = np.append(success, 0)
 
-print(success)
+print(landing_speed)
 # visualize the simulation results
 fig, axs = plt.subplots(3) 
 plt.tight_layout()
 axs[0].plot(parachute_diam, end_time)
-axs[0].set_title('velocity vs. time', fontsize=10)
+axs[0].set_title('simulated time vs parachute diameter', fontsize=10)
 # axs[0].set_xlabel()
 axs[0].grid()
 axs[1].plot(parachute_diam, landing_speed)
-axs[1].set_title('altitude vs. time', fontsize=10)
+axs[1].set_title('rover speed vs parachute diameter', fontsize=10)
 axs[1].grid()
 axs[2].plot(parachute_diam, success)
-axs[2].set_title('fuel mass vs. time', fontsize=10)
+axs[2].set_title('rover landing success vs parachute diameter', fontsize=10)
 axs[2].grid()
 
 plt.show()
