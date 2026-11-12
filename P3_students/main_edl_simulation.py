@@ -77,5 +77,5 @@ axs2[0].grid()
 axs2[1].plot(t,sky_crane_hover_pos)
 axs2[1].set_title('position of sky crane vs. time')
 axs2[1].grid()
-plt.show()
 
+plt.show()
