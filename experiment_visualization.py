@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
-from define_experiment import experiment1
+from define_experiment_old import experiment1
 
 # defining experiment conditions
 experiment, end_event = experiment1()
