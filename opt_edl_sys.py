@@ -201,7 +201,7 @@ edl_system['rover'] = simulate_rover(edl_system['rover'],planet,experiment,end_e
 time_rover = edl_system['rover']['telemetry']['completion_time']
 
 total_time = time_edl + time_rover
- 
+
 edl_system_total_cost=get_cost_edl(edl_system)
 
 print('----------------------------------------')
