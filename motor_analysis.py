@@ -84,7 +84,7 @@ fig, ax1 = plt.subplots()
 ax2 = ax1.twinx()
 
 for i in range(len(motor_types)):
-    motor_test = define_motor(motor_base,motor_types[i])
+    motor_test = define_motor({**motor_base}, motor_types[i])
 
     X = np.linspace(0,motor_test['torque_stall'],50)  # torque
     Y1 = (motor_test['torque_stall']-X)*motor_test['speed_noload']/(motor_test['torque_stall']-motor_test['torque_noload']) # speed
