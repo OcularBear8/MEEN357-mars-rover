@@ -87,7 +87,7 @@ if __name__=='__main__':
         global Nfeval
         if Nfeval == 1:
             print('Iter        x0         x1        x2        x3         x4           fval')
-            
+
         print('{0:4d}   {1: 3.6f}   {2: 3.6f}   {3: 3.6f}   {4: 3.6f}  {5: 3.6f} \
             {6: 3.6f}'.format(Nfeval, Xi[0], Xi[1], Xi[2], Xi[3], Xi[4], obj_f(Xi)))
         Nfeval += 1
@@ -117,7 +117,7 @@ if __name__=='__main__':
     # call the SLSQP optimizer ---------------------------------------------------#
     # options = {'maxiter': 50,
     #             'disp' : True}
-    # res = minimize(obj_f, x0, method='SLSQP', constraints=ineq_cons, bounds=bounds, 
+    # res = minimize(obj_f, x0, method='SLSQP', constraints=ineq_cons, bounds=bounds,
     #                 options=options, callback=callbackF)
     # end call to the SLSQP optimizer --------------------------------------------#
     ###############################################################################
@@ -144,13 +144,13 @@ if __name__=='__main__':
     #     cons_cobyla.append(l)
     #     cons_cobyla.append(u)
     #     cons_cobyla.append(ineq_cons)  # the rest of the constraints
-    # options = {'maxiter': 50, 
+    # options = {'maxiter': 50,
     #             'disp' : 2}
     # res = minimize(obj_f, x0, method='COBYLA', constraints=cons_cobyla, options=options)
     # end call to the COBYLA optimizer -------------------------------------------#
     ###############################################################################
 
-    # check if we have a feasible solution 
+    # check if we have a feasible solution
     c = constraints_edl_system(res.x,edl_system,planet,mission_events,tmax,experiment,
                             end_event,min_strength,max_rover_velocity,max_cost,
                             max_batt_energy_per_meter)
@@ -203,7 +203,7 @@ if __name__=='__main__':
     time_rover = edl_system['rover']['telemetry']['completion_time']
 
     total_time = time_edl + time_rover
-    
+
     edl_system_total_cost=get_cost_edl(edl_system)
 
     print('----------------------------------------')

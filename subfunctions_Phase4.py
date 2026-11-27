@@ -977,9 +977,8 @@ def rover_dynamics(t, y, rover, planet, experiment):
     alpha_fun = interp1d(experiment['alpha_dist'].ravel(), experiment['alpha_deg'].ravel(), kind = 'cubic', fill_value="extrapolate")
     terrain_angle = float(alpha_fun(pos))
     F = F_net(omega, terrain_angle, rover, planet, experiment['Crr'])
-    
     m = get_mass_rover(rover)
-    accel = float(F/m)
+    accel = float(F[0]/m)
     dydt = np.array([accel, v], dtype = float)
     
     return dydt
