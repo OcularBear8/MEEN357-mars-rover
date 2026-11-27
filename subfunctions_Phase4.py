@@ -917,7 +917,7 @@ def battenergy(t,v,rover):
     
     # integrate to calculate energy    
     #E_motor = simpson(P_batt, t)
-    E_motor = np.trapz(P_batt,t)
+    E_motor = np.trapezoid(P_batt,t)
     E = 6*E_motor # 6 wheels, each with a dedicated motor
     
     return E

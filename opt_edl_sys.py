@@ -24,7 +24,7 @@ if __name__=='__main__':
     mission_events = define_mission_events()
     edl_system = define_chassis(edl_system,'magnesium')
     edl_system = define_motor(edl_system,'speed_he')
-    edl_system = define_batt_pack(edl_system,'NiMH', 16)
+    edl_system = define_batt_pack(edl_system,'NiMH', 6)
     tmax = 5000
 
     # Overrides what might be in the loaded data to establish our desired
@@ -62,7 +62,7 @@ if __name__=='__main__':
 
     # initial guess
     # parachute diam, wheel radius, chassis mass, gear diam, fuel mass
-    x0 = np.array([14, .6, 250, 0.09, 150]) 
+    x0 = np.array([14.004061, 0.578922, 250.148937, 0.050000, 150.932929]) 
 
     # lambda for the objective function
     obj_f = lambda x: obj_fun_time(x,edl_system,planet,mission_events,tmax,
@@ -103,13 +103,13 @@ if __name__=='__main__':
 
     ###############################################################################
     #call the trust-constr optimizer --------------------------------------------#
-    options = {'maxiter': 500, 
-                # 'initial_constr_penalty' : 5.0,
-                # 'initial_barrier_parameter' : 1.0,
-                'verbose' : 3,
-                'disp' : True}
-    res = minimize(obj_f, x0, method='trust-constr', constraints=nonlinear_constraint, 
-                    options=options, bounds=bounds)
+    # options = {'maxiter': 500, 
+    #             # 'initial_constr_penalty' : 5.0,
+    #             # 'initial_barrier_parameter' : 1.0,
+    #             'verbose' : 3,
+    #             'disp' : True}
+    # res = minimize(obj_f, x0, method='trust-constr', constraints=nonlinear_constraint, 
+    #                 options=options, bounds=bounds)
     # end call to the trust-constr optimizer -------------------------------------#
     ###############################################################################
 
@@ -124,9 +124,9 @@ if __name__=='__main__':
 
     ###############################################################################
     # call the differential evolution optimizer ----------------------------------#
-    # popsize=5 # define the population size
-    # maxiter=100 # define the maximum number of iterations
-    # res = differential_evolution(obj_f, bounds=bounds, constraints=nonlinear_constraint, popsize=popsize, maxiter=maxiter, disp=True, polish = False, x0=x0, init='sobol', workers=-1) 
+    popsize=5 # define the population size
+    maxiter=500 # define the maximum number of iterations
+    res = differential_evolution(obj_f, bounds=bounds, constraints=nonlinear_constraint, popsize=popsize, maxiter=maxiter, disp=3, polish = False, x0=x0, init='sobol') 
     # end call the differential evolution optimizer ------------------------------#
     ###############################################################################
 
@@ -208,19 +208,19 @@ if __name__=='__main__':
 
     print('----------------------------------------')
     print('----------------------------------------')
-    print('Optimized parachute diameter   = {:.6f} [m]'.format(xbest[0]))
-    print('Optimized rocket fuel mass     = {:.6f} [kg]'.format(xbest[4]))
-    print('Time to complete EDL mission   = {:.6f} [s]'.format(time_edl))
-    print('Rover velocity at landing      = {:.6f} [m/s]'.format(edl_system['rover_touchdown_speed']))
-    print('Optimized wheel radius         = {:.6f} [m]'.format(xbest[1])) 
-    print('Optimized d2                   = {:.6f} [m]'.format(xbest[3])) 
-    print('Optimized chassis mass         = {:.6f} [kg]'.format(xbest[2]))
-    print('Time to complete rover mission = {:.6f} [s]'.format(time_rover))
-    print('Time to complete mission       = {:.6f} [s]'.format(total_time))
-    print('Average velocity               = {:.6f} [m/s]'.format(edl_system['rover']['telemetry']['average_velocity']))
-    print('Distance traveled              = {:.6f} [m]'.format(edl_system['rover']['telemetry']['distance_traveled']))
-    print('Battery energy per meter       = {:.6f} [J/m]'.format(edl_system['rover']['telemetry']['energy_per_distance']))
-    print('Total cost                     = {:.6f} [$]'.format(edl_system_total_cost))
+    print('Optimized parachute diameter   = {:.16f} [m]'.format(xbest[0]))
+    print('Optimized rocket fuel mass     = {:.16f} [kg]'.format(xbest[4]))
+    print('Time to complete EDL mission   = {:.16f} [s]'.format(time_edl))
+    print('Rover velocity at landing      = {:.16f} [m/s]'.format(edl_system['rover_touchdown_speed']))
+    print('Optimized wheel radius         = {:.16f} [m]'.format(xbest[1])) 
+    print('Optimized d2                   = {:.16f} [m]'.format(xbest[3])) 
+    print('Optimized chassis mass         = {:.16f} [kg]'.format(xbest[2]))
+    print('Time to complete rover mission = {:.16f} [s]'.format(time_rover))
+    print('Time to complete mission       = {:.16f} [s]'.format(total_time))
+    print('Average velocity               = {:.16f} [m/s]'.format(edl_system['rover']['telemetry']['average_velocity']))
+    print('Distance traveled              = {:.16f} [m]'.format(edl_system['rover']['telemetry']['distance_traveled']))
+    print('Battery energy per meter       = {:.16f} [J/m]'.format(edl_system['rover']['telemetry']['energy_per_distance']))
+    print('Total cost                     = {:.16f} [$]'.format(edl_system_total_cost))
     print('----------------------------------------')
     print('----------------------------------------')
 
